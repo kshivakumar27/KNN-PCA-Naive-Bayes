@@ -1,0 +1,54 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+
+dataFrame = pd.read_csv('C:\\Users\\madhurab\\Desktop\\knn (1).csv')
+
+from sklearn.model_selection import train_test_split
+
+X_train,X_test,y_train,y_test=train_test_split(dataFrame[['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6','feature7','feature8','feature9','feature10','feature11','feature12']], 
+                                               dataFrame['class'], random_state=0)
+
+print("X_train shape: " + str(X_train.shape))
+print("y_train shape: " + str(y_train.shape))
+print("X_test shape: " + str(X_test.shape))
+print("y_test shape: " + str(y_test.shape))
+
+from sklearn.neighbors import KNeighborsClassifier
+
+
+knn = KNeighborsClassifier(n_neighbors = 2)
+knn.fit(X_train, y_train)
+print("Test score for k2: " + str(round((knn.score(X_test,y_test)*100), 4)) + '%')
+
+
+error_rate = []
+
+for k in range(1,40):
+    knn = KNeighborsClassifier(n_neighbors=k)
+    knn.fit(X_train,y_train)
+    y_pred_k = knn.predict(X_test)
+    error_rate.append(np.mean(y_pred_k != y_test))
+    
+def compute_distances(self, X, X_test):
+        distances = []
+        for i in range(X_test.shape[0]):
+            euclidian_distances = np.zeros(X.shape[0])
+            oneSampleList = []
+            for j in range(len(X)):
+                euclidian_distances[j] = np.sqrt(np.sum(np.square(np.array(X_test[i]) - np.array(X[j]))))
+                oneSampleList.append([euclidian_distances[j], self.y_train[j]])
+
+            distances.append(sorted(oneSampleList))
+        return distances
+
+#plt.subplots(2,2,figsize=(10,4))
+plt.figure(figsize=(10,6))
+plt.plot(range(1,40), error_rate, color='blue', linestyle='dashed', marker='o', markerfacecolor='red', markersize=10)
+plt.title('Error Rate vs. K Value')
+plt.xlabel('K')
+plt.ylabel('Error Rate')
+
+knn = KNeighborsClassifier(n_neighbors = 4)
+knn.fit(X_train, y_train)
+print("Test score for k=5: " + str(round((knn.score(X_test,y_test)*100), 4)) + '%')
